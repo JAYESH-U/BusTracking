@@ -32,12 +32,12 @@ mongoose.connect(process.env.MONGO_URI)
 
 //buses
 const bus0 = new Bus({
-    route: "Sambra",
+    route: "KLS Gogte Institute of Technology",
     busNo: 3,
-    password: "Sambra",
-    numberPlate: "KA 22 MC 2166",
-    longitude: 74.61385221509138,
-    latitude: 15.869056261665328
+    password: "KLS Gogte Institute of Technology Udyambag",
+    numberPlate: "none",
+    longitude: 74.4871326464867,
+    latitude: 15.815238972535886
 });
 const bus1 = new Bus({
     route: "Mahantesh nagar",

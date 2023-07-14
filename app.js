@@ -274,9 +274,9 @@ app.get("/selectedbus", function (req, res) {
     if (selectedBus === null) {
         busNo = 1;
     }else{
-        busNo = selectedBus;
+        busNo = selectedBus.busNo;
     }
-    
+
     Bus.findOne({ busNo: busNo })
         .then((foundBus) => {
             if (!foundBus) {

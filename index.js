@@ -1,9 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const _ = require("lodash");
 const mongoose = require("mongoose");
-const { assignWith } = require("lodash");
 const mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
+
+const Bus = require("./models/busModel");
+const Std = require("./models/studentModel");
 
 const app = express();
 
@@ -16,6 +18,9 @@ app.use(bodyParser.json());
 mapboxgl.accessToken = 'pk.eyJ1IjoiamF5ZXNoLXUiLCJhIjoiY2xqdml5Z2pwMDltczNlcDR5eDh6bHE4ZCJ9.iE4WstOoi83JSin5Z4ECOg';
 
 // Connect to MongoDB
+const PORT = process.env.PORT || 3000;
+
+//  || process.env.MONGO_URI
 mongoose.connect('mongodb://127.0.0.1:27017/busTrackDB')
     .then(() => {
         console.log('Connected to MongoDB');
@@ -26,26 +31,26 @@ mongoose.connect('mongodb://127.0.0.1:27017/busTrackDB')
     });
 
 
-//create item schema
-const busSchema = new mongoose.Schema({
-    route: String,
-    busNo: Number,
-    password: String,
-    numberPlate: String,
-    longitude: Number,
-    latitude: Number
-}, { timestamps: true }
-);
+// //create item schema
+// const busSchema = new mongoose.Schema({
+//     route: String,
+//     busNo: Number,
+//     password: String,
+//     numberPlate: String,
+//     longitude: Number,
+//     latitude: Number
+// }, { timestamps: true }
+// );
 
-const studentSchema = new mongoose.Schema({
-    usn: String,
-    password: String
-});
+// const studentSchema = new mongoose.Schema({
+//     usn: String,
+//     password: String
+// });
 
-//model item
-const Bus = mongoose.model("bus", busSchema);
+// //model item
+// const Bus = mongoose.model("bus", busSchema);
 
-const Std = mongoose.model("student", studentSchema);
+// const Std = mongoose.model("student", studentSchema);
 
 //buses
 const bus1 = new Bus({

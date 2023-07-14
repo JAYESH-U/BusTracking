@@ -293,6 +293,9 @@ app.post("/map", function (req, res) {
 app.get("/selectedbus", function (req, res) {
     console.log("trying to fetch");
     const busNo = selectedBus.busNo;
+    if(selectedBus === null){
+        busNo = 1;
+    }
     Bus.findOne({ busNo: busNo })
         .then((foundBus) => {
             if (!foundBus) {

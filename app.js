@@ -31,6 +31,14 @@ mongoose.connect(process.env.MONGO_URI)
     });
 
 //buses
+const bus0 = new Bus({
+    route: "Sambra",
+    busNo: 3,
+    password: "Sambra",
+    numberPlate: "KA 22 MC 2166",
+    longitude: 74.61385221509138,
+    latitude: 15.869056261665328
+});
 const bus1 = new Bus({
     route: "Mahantesh nagar",
     busNo: 1,
@@ -176,7 +184,6 @@ app.post("/students", function (req, res) {
                                 res.redirect("/map");
                             } else {
                                 console.log(busList[0]);
-                                selectedBus = busList[0];
                                 res.render("map", { listTitle: "Bus Tracker", busList, foundBus: busList[0] });
                             }
                         })
@@ -270,10 +277,12 @@ app.post("/map", function (req, res) {
 //endpoint to fetch the foundBus data through AJAX
 app.get("/selectedbus", function (req, res) {
     console.log("trying to fetch");
+    console.log("Selected Bus O: " + selectedBus);
     let busNo = null;
     if (selectedBus === null) {
-        busNo = 1;
-    }else{
+        busNo = 0;
+    } else {
+        console.log("Selected Bus : " + selectedBus);
         busNo = selectedBus.busNo;
     }
 
@@ -284,7 +293,7 @@ app.get("/selectedbus", function (req, res) {
             } else {
                 console.log("Found Bus. /selectedBus");
 
-                console.log(foundBus);
+                // console.log(foundBus);
                 res.json(foundBus);
             }
         })

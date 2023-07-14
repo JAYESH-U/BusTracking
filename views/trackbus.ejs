@@ -1,0 +1,65 @@
+<%- include("partials/header") -%>
+
+<body>
+    <!-- add bus name to detect the correct bus -->
+    <h3>Sending location of <%= foundBus.route %></h3>
+    <button id="button" onclick="getLocation()" value="<%= foundBus.busNo %>" >Sending bus location.</button>
+    <p id="demo"></p>
+    <script>
+        var x = document.getElementById("demo");
+        const busNo = document.getElementById("button").value;
+        //const busNo = <%= foundBus.busNo %>;
+        var interval = 10000; // 10 seconds
+    
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+                setInterval(updateLocation, interval);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+    
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            x.innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude + "<br>Bus number: " + busNo;
+            sendCoordinates(latitude, longitude);
+        }
+    
+        function updateLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(updatePosition, handleLocationError);
+            }
+        }
+    
+        function updatePosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            x.innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude + "<br>Bus number: " + busNo;
+            sendCoordinates(latitude, longitude);
+        }
+    
+        function handleLocationError(error) {
+            console.log("Error getting current location: " + error.message);
+        }
+    
+        function sendCoordinates(latitude, longitude) {
+            var xhr = new XMLHttpRequest();
+            /*const busNo = document.getElementById("button").value;  */
+            xhr.open("POST", "/trackbus", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log("Coordinates sent successfully!");
+              }
+            };
+            var data = JSON.stringify({ latitude: latitude, longitude: longitude, busNo: busNo });
+            xhr.send(data);
+          }
+          
+    </script>
+    
+    
+
+<%- include("partials/footer") -%>

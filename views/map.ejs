@@ -1,0 +1,173 @@
+<%- include("partials/header") -%>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="img/bus.png" alt="BusLogo" width="30" height="24" class="d-inline-block align-text-top">
+                <%=listTitle%>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Select bus
+                        </a>
+                        <ul class="dropdown-menu">
+                            <% busList.forEach(function(item){ %>
+                                <li class="dropdown-item">
+                                    <form class="item" action="/map" method="POST">
+                                        <button class="busListButton" id="<%= item.busNo %>" type="submit" name="busNo"
+                                            value="<%= item.busNo %>">
+                                            <%= item.route %>
+                                        </button>
+                                    </form>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id='map'></div>
+
+    <footer>@copy 2023 Jayesh Uramanatti</footer>
+
+    <script>
+
+        //var longitude = 74.48721012569833;
+        //var latitude = 15.81512410285324;
+
+        //if (<%= foundBus.latitude %> && <%= foundBus.longitude %>) {
+        //    longitude = <%= foundBus.longitude %>;
+        //    latitude = <%= foundBus.latitude %>;
+        //}
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoiamF5ZXNoLXUiLCJhIjoiY2xqdml5Z2pwMDltczNlcDR5eDh6bHE4ZCJ9.iE4WstOoi83JSin5Z4ECOg';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            zoom: 14,
+            center: [74.48721012569833, 15.81512410285324]
+        });
+
+        // create the popup
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+            'Bus route: <b><%= foundBus.route %></b>,<br>Updated at: <b><%= foundBus.updatedAt.toLocaleTimeString() %></b>'
+        );
+
+        // create DOM element for the marker
+        const el = document.createElement('div');
+        el.id = 'marker';
+
+        //new mapboxgl.Marker(el)
+        //    .setLngLat([longitude, latitude])
+        //    .setPopup(popup)
+        //    .addTo(map);
+
+        map.on('load', async () => {
+
+            // Get the initial location of the International Space Station (bus).
+            const geojson = await getLocation();
+
+            // Add the bus location as a source.
+            map.addSource('bus', {
+                type: 'geojson',
+                data: geojson
+            });
+            
+            // Add the rocket symbol layer to the map.
+            map.addLayer({
+                'id': 'bus',
+                'type': 'symbol',
+                'source': 'bus',
+                'layout': {
+                    'icon-image': 'bus'
+                }
+            });
+
+            // Update the source from the API every 10 seconds.
+            const updateSource = setInterval(async () => {
+                const geojson = await getLocation(updateSource);
+                map.getSource('bus').setData(geojson);
+            }, 2000);
+
+            async function getLocation(updateSource) {
+                // Make a GET request to the API and return the location of the bus.
+                try {
+                    const response = await fetch("/selectedbus");
+                    const { latitude, longitude, route, updatedAt } = await response.json();
+                    // Fly the map to the location.
+                    map.flyTo({
+                        center: [longitude, latitude],
+                        speed: 0.5,
+                        zoom: 14
+                    });
+
+                    console.log(longitude +" "+ latitude +" "+ route +" "+ updatedAt);
+
+                    // Return the location of the bus as GeoJSON.
+                    return {
+                        'type': 'FeatureCollection',
+                        'features': [
+                            {
+                                'type': 'Feature',
+                                'properties': {
+                                    'route': route,
+                                    'updatedAt': updatedAt
+                                },
+                                'geometry': {
+                                    'type': 'Point',
+                                    'coordinates': [longitude, latitude]
+                                }
+                            }
+                        ]
+                    };
+                } catch (err) {
+                    // If the updateSource interval is defined, clear the interval to stop updating the source.
+                    if (updateSource) clearInterval(updateSource);
+                    throw new Error(err);
+                }
+            }
+
+            map.on('click', 'bus', (e) => {
+                // Copy coordinates array.
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const foundBus = e.features[0].properties;
+                
+                // Ensure that if the map is zoomed out such that multiple
+                // copies of the feature are visible, the popup appears
+                // over the copy being pointed to.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                
+                // Create the popup content using the foundBus properties
+                let popupContent = 'Bus route: <b>' + foundBus.route + '</b>';
+                if (foundBus.updatedAt) {
+                    const updatedAt = new Date(foundBus.updatedAt);
+                    const formattedDate = updatedAt.toLocaleDateString(); // Format the date as needed
+                    const formattedTime = updatedAt.toLocaleTimeString(); // Format the time as needed
+                    popupContent += ',<br>Updated at: <b>' + formattedTime + ', ' + formattedDate + '</b>';
+                }
+                
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(popupContent)
+                    .addTo(map);
+            });
+            
+            
+        });
+
+
+    </script>
+
+<%- include("partials/footer") -%>

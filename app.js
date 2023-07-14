@@ -184,6 +184,7 @@ app.post("/students", function (req, res) {
                                 res.redirect("/map");
                             } else {
                                 console.log(busList[0]);
+                                selectedBus = busList[0];
                                 res.render("map", { listTitle: "Bus Tracker", busList, foundBus: busList[0] });
                             }
                         })
@@ -255,7 +256,7 @@ app.post("/map", function (req, res) {
                     .then(function (busList) {
                         if (busList.length === 0) {
                             insertDefaultBusItems();
-                            res.redirect("/map");
+                            res.redirect("/students");
                         } else {
                             res.render("map", { listTitle: "Bus Tracker", busList, foundBus });
                         }
@@ -265,12 +266,12 @@ app.post("/map", function (req, res) {
                     });
             } else {
                 console.log("Bus not found..!!");
-                res.redirect("/map");
+                res.redirect("/students");
             }
         })
         .catch((error) => {
             console.log("Error updating map: " + error);
-            res.redirect("/map");
+            res.redirect("/students");
         });
 });
 

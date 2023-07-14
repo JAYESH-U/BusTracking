@@ -80,7 +80,7 @@ const std3 = new Std({
     password: "2GI21IS057"
 });
 
-const defaultBusItems = [bus1, bus2, bus3];
+const defaultBusItems = [bus0, bus1, bus2, bus3];
 const defaultStdItems = [std1, std2, std3];
 
 function insertDefaultBusItems() {

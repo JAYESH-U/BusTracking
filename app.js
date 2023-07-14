@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // mapbox key or token
-mapboxgl.accessToken = 'pk.eyJ1IjoiamF5ZXNoLXUiLCJhIjoiY2xqdml5Z2pwMDltczNlcDR5eDh6bHE4ZCJ9.iE4WstOoi83JSin5Z4ECOg';
+mapboxgl.accessToken = process.env.MAPBOX_TOKEN;
 
 // Connect to MongoDB
 const PORT = process.env.PORT || 3000;
@@ -29,28 +29,6 @@ mongoose.connect(process.env.MONGO_URI)
     .catch((error) => {
         console.error('Error connecting to MongoDB:', error);
     });
-
-
-// //create item schema
-// const busSchema = new mongoose.Schema({
-//     route: String,
-//     busNo: Number,
-//     password: String,
-//     numberPlate: String,
-//     longitude: Number,
-//     latitude: Number
-// }, { timestamps: true }
-// );
-
-// const studentSchema = new mongoose.Schema({
-//     usn: String,
-//     password: String
-// });
-
-// //model item
-// const Bus = mongoose.model("bus", busSchema);
-
-// const Std = mongoose.model("student", studentSchema);
 
 //buses
 const bus1 = new Bus({
@@ -293,7 +271,7 @@ app.post("/map", function (req, res) {
 app.get("/selectedbus", function (req, res) {
     console.log("trying to fetch");
     const busNo = selectedBus.busNo;
-    if(selectedBus === null){
+    if (selectedBus === null) {
         busNo = 1;
     }
     Bus.findOne({ busNo: busNo })

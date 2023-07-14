@@ -33,7 +33,7 @@ mongoose.connect(process.env.MONGO_URI)
 //buses
 const bus0 = new Bus({
     route: "KLS Gogte Institute of Technology",
-    busNo: 3,
+    busNo: 0,
     password: "KLS Gogte Institute of Technology Udyambag",
     numberPlate: "none",
     longitude: 74.4871326464867,

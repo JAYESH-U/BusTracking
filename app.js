@@ -20,8 +20,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiamF5ZXNoLXUiLCJhIjoiY2xqdml5Z2pwMDltczNlcDR5e
 // Connect to MongoDB
 const PORT = process.env.PORT || 3000;
 
-//  || process.env.MONGO_URI
-mongoose.connect('mongodb://127.0.0.1:27017/busTrackDB' || process.env.MONGO_URI )
+//  || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/busTrackDB'  
+mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log('Connected to MongoDB');
         // Continue with the rest of the code here

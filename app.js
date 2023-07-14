@@ -273,13 +273,16 @@ app.get("/selectedbus", function (req, res) {
     let busNo = null;
     if (selectedBus === null) {
         busNo = 1;
+    }else{
+        busNo = selectedBus;
     }
+    
     Bus.findOne({ busNo: busNo })
         .then((foundBus) => {
             if (!foundBus) {
-                console.log("Bus not found.");
+                console.log("Bus not found. /selectedBus");
             } else {
-                console.log("Found Bus.");
+                console.log("Found Bus. /selectedBus");
 
                 console.log(foundBus);
                 res.json(foundBus);

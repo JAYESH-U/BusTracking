@@ -198,6 +198,7 @@ app.post("/students", function (req, res) {
                                 res.redirect("/map");
                             } else {
                                 console.log(busList[0]);
+                                selectedBus = busList[0];
                                 res.render("map", { listTitle: "Bus Tracker", busList, foundBus: busList[0] });
                             }
                         })

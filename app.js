@@ -270,7 +270,7 @@ app.post("/map", function (req, res) {
 //endpoint to fetch the foundBus data through AJAX
 app.get("/selectedbus", function (req, res) {
     console.log("trying to fetch");
-    const busNo = selectedBus.busNo;
+    const busNo = null;
     if (selectedBus === null) {
         busNo = 1;
     }

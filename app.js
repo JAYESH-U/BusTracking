@@ -41,7 +41,8 @@ mongoose
     });
 
 const store = new MongoDBSession({
-    uri: MongoURI,
+    // uri: MongoURI,
+    uri: process.env.MONGO_URI,
     collection: "mySessions",
 });
 

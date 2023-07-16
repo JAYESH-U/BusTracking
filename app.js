@@ -28,7 +28,7 @@ const MongoURI = 'mongodb://127.0.0.1:27017/busTrackDB';
 
 // process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/busTrackDB'  
 mongoose
-    .connect(MongoURI, {
+    .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })

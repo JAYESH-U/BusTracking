@@ -3,9 +3,14 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
+const session = require("express-session");
+var MongoDBSession = require('connect-mongodb-session')(session);
 
 const Bus = require("./models/busModel");
 const Std = require("./models/studentModel");
+
+const defaultBusItems = require("./defaultItemsInDB/buses");
+const defaultStdItems = require("./defaultItemsInDB/students");
 
 const app = express();
 
@@ -19,9 +24,14 @@ mapboxgl.accessToken = process.env.MAPBOX_TOKEN;
 
 // Connect to MongoDB
 const PORT = process.env.PORT || 3000;
+const MongoURI = 'mongodb://127.0.0.1:27017/busTrackDB';
 
-//  || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/busTrackDB'  
-mongoose.connect(process.env.MONGO_URI)
+// process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/busTrackDB'  
+mongoose
+    .connect(MongoURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
     .then(() => {
         console.log('Connected to MongoDB');
         // Continue with the rest of the code here
@@ -30,58 +40,30 @@ mongoose.connect(process.env.MONGO_URI)
         console.error('Error connecting to MongoDB:', error);
     });
 
-//buses
-const bus0 = new Bus({
-    route: "KLS Gogte Institute of Technology",
-    busNo: 0,
-    password: "KLS Gogte Institute of Technology Udyambag",
-    numberPlate: "none",
-    longitude: 74.4871326464867,
-    latitude: 15.815238972535886
-});
-const bus1 = new Bus({
-    route: "Mahantesh nagar",
-    busNo: 1,
-    password: "Mahantesh nagar",
-    numberPlate: "KA 22 MC 2166",
-    longitude: 74.53642393726847,
-    latitude: 15.881915347206428
-});
-const bus2 = new Bus({
-    route: "Hanuman nagar",
-    busNo: 10,
-    password: "Hanuman nagar",
-    numberPlate: "KA 22 MC 2166",
-    longitude: 74.48591797126895,
-    latitude: 15.876246560391277
-});
-const bus3 = new Bus({
-    route: "Sambra",
-    busNo: 3,
-    password: "Sambra",
-    numberPlate: "KA 22 MC 2166",
-    longitude: 74.61385221509138,
-    latitude: 15.869056261665328
+const store = new MongoDBSession({
+    uri: MongoURI,
+    collection: "mySessions",
 });
 
-//students
-const std1 = new Std({
-    usn: "2GI21IS025",
-    password: "2GI21IS025"
-});
+//sessions
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+    cookie: {
+        sameSite: "strict",
+    },
+}));
 
-const std2 = new Std({
-    usn: "2GI21IS012",
-    password: "2GI21IS012"
-});
-
-const std3 = new Std({
-    usn: "2GI21IS057",
-    password: "2GI21IS057"
-});
-
-const defaultBusItems = [bus0, bus1, bus2, bus3];
-const defaultStdItems = [std1, std2, std3];
+const isAuth = (req, res, next) => {
+    // console.log(store);
+    if (req.session.isAuth) {
+        next();
+    } else {
+        res.redirect("/");
+    }
+}
 
 function insertDefaultBusItems() {
     // insertMany items
@@ -106,6 +88,7 @@ function insertDefaultStdItems() {
 }
 
 app.get("/", function (req, res) {
+    // req.session.isAuth = true;
     res.render("home");
 });
 
@@ -135,8 +118,9 @@ app.post("/busdriver", function (req, res) {
             } else {
                 console.log("Found Bus.");
 
-                // verify password.
                 if (foundBus.password === pass) {
+                    req.session.isAuth = true;
+                    req.session.selectedBus = foundBus;
                     res.render("trackbus", { foundBus });
                 } else {
                     console.log("Wrong password.");
@@ -177,6 +161,8 @@ app.post("/students", function (req, res) {
 
                 // verify password.
                 if (foundUser.password === pass) {
+                    req.session.isAuth = true;
+
                     Bus.find({})
                         .then(function (busList) {
                             if (busList.length === 0) {
@@ -202,7 +188,7 @@ app.post("/students", function (req, res) {
 });
 
 //edit just render track bus after login.
-app.post("/trackbus", function (req, res) {
+app.post("/trackbus", isAuth, function (req, res) {
     const latitude = req.body.latitude;
     const longitude = req.body.longitude;
     const busNo = req.body.busNo;
@@ -240,9 +226,9 @@ function updateMap(busNumber) {
 }
 
 //shared variable to store the latest location data
-let selectedBus = null;
+// let selectedBus = null;
 
-app.post("/map", function (req, res) {
+app.post("/map", isAuth, function (req, res) {
     const busNumber = req.body.busNo;
     console.log(busNumber);
 
@@ -250,7 +236,7 @@ app.post("/map", function (req, res) {
         .then((foundBus) => {
             if (foundBus) {
                 console.log(foundBus);
-                selectedBus = foundBus;
+                req.session.selectedBus = foundBus;
 
                 Bus.find({})
                     .then(function (busList) {
@@ -276,33 +262,17 @@ app.post("/map", function (req, res) {
 });
 
 //endpoint to fetch the foundBus data through AJAX
-app.get("/selectedbus", function (req, res) {
-    console.log("trying to fetch");
-    console.log("Selected Bus O: " + selectedBus);
-    let busNo = null;
-    if (selectedBus === null) {
-        busNo = 0;
+app.get("/selectedbus", isAuth, function (req, res) {
+    const selectedBus = req.session.selectedBus; // Retrieve the selected bus from the session
+
+    if (!selectedBus) {
+        console.log("Bus not found. /selectedBus");
+        res.sendStatus(404);
     } else {
-        console.log("Selected Bus : " + selectedBus);
-        busNo = selectedBus.busNo;
+        console.log("Found Bus. /selectedBus");
+
+        res.json(selectedBus);
     }
-
-    Bus.findOne({ busNo: busNo })
-        .then((foundBus) => {
-            if (!foundBus) {
-                console.log("Bus not found. /selectedBus");
-            } else {
-                console.log("Found Bus. /selectedBus");
-
-                // console.log(foundBus);
-                res.json(foundBus);
-            }
-        })
-        .catch((err) => {
-            console.log("Error finding bus : " + err);
-        })
-    console.log(selectedBus);
-    // res.json(selectedBus);
 });
 
 

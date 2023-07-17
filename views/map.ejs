@@ -97,7 +97,7 @@
             const updateSource = setInterval(async () => {
                 const geojson = await getLocation(updateSource);
                 map.getSource('bus').setData(geojson);
-            }, 2000);
+            }, 5000);
 
             async function getLocation(updateSource) {
                 // Make a GET request to the API and return the location of the bus.

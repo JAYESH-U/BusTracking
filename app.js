@@ -53,7 +53,8 @@ app.use(session({
     saveUninitialized: false,
     store: store,
     cookie: {
-        sameSite: "strict",
+        maxAge: 10800000 , // 3 hour in milliseconds
+        sameSite: 'strict'
     },
 }));
 
@@ -264,7 +265,7 @@ app.post("/map", isAuth, function (req, res) {
 
 //endpoint to fetch the foundBus data through AJAX
 app.get("/selectedbus", isAuth, function (req, res) {
-    const selectedBus = req.session.selectedBus; // Retrieve the selected bus from the session
+    //const selectedBus = req.session.selectedBus; // Retrieve the selected bus from the session
 
     if (!selectedBus) {
         console.log("Bus not found. /selectedBus");
@@ -272,7 +273,18 @@ app.get("/selectedbus", isAuth, function (req, res) {
     } else {
         console.log("Found Bus. /selectedBus");
 
-        res.json(selectedBus);
+        Bus.findOne({busNo: req.session.selectedBus.busNo})
+        .then((foundBus)=>{
+            if(foundBus){
+                //console.log("found one bus : "+ foundBus.longitude +" "+ foundBus.latitude);
+                res.json(foundBus);
+            }else{
+                console.log("bus not match.");
+            }
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
     }
 });
 

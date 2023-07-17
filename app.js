@@ -122,6 +122,7 @@ app.post("/busdriver", function (req, res) {
 
                 if (foundBus.password === pass) {
                     req.session.isAuth = true;
+                    req.session.user = foundBus.route;
                     req.session.selectedBus = foundBus;
                     res.render("trackbus", { foundBus });
                 } else {
@@ -164,6 +165,7 @@ app.post("/students", function (req, res) {
                 // verify password.
                 if (foundUser.password === pass) {
                     req.session.isAuth = true;
+                    req.session.user = uName;
 
                     Bus.find({})
                         .then(function (busList) {
@@ -172,7 +174,7 @@ app.post("/students", function (req, res) {
                                 res.redirect("/students");
                             } else {
                                 console.log(busList[0]);
-                                selectedBus = busList[0];
+                                req.session.selectedBus = busList[0];
                                 res.render("map", { listTitle: "Bus Tracker", busList, foundBus: busList[0] });
                             }
                         })
@@ -227,9 +229,6 @@ function updateMap(busNumber) {
     });
 }
 
-//shared variable to store the latest location data
-// let selectedBus = null;
-
 app.post("/map", isAuth, function (req, res) {
     const busNumber = req.body.busNo;
     console.log(busNumber);
@@ -267,7 +266,7 @@ app.post("/map", isAuth, function (req, res) {
 app.get("/selectedbus", isAuth, function (req, res) {
     //const selectedBus = req.session.selectedBus; // Retrieve the selected bus from the session
 
-    if (!selectedBus) {
+    if (!req.session.selectedBus) {
         console.log("Bus not found. /selectedBus");
         res.sendStatus(404);
     } else {

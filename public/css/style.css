@@ -25,11 +25,11 @@
     height: 500px;
 }
 
-#marker {
-    background-image: url('/img/busI.png');
+.marker {
+    background-image: url('/img/stop.png');
     background-size: cover;
-    width: 50px;
-    height: 50px;
+    width: 20px;
+    height: 20px;
     border-radius: 20%;
     cursor: pointer;
 }

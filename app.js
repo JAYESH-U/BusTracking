@@ -12,6 +12,8 @@ const Std = require("./models/studentModel");
 const defaultBusItems = require("./defaultItemsInDB/buses");
 const defaultStdItems = require("./defaultItemsInDB/students");
 
+const locations = require("./busStops/buspath.json")
+
 const app = express();
 
 app.set("view engine", "ejs");
@@ -28,7 +30,7 @@ const MongoURI = 'mongodb://127.0.0.1:27017/busTrackDB';
 
 // process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/busTrackDB'  
 mongoose
-    .connect(process.env.MONGO_URI, {
+    .connect(MongoURI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
@@ -41,8 +43,7 @@ mongoose
     });
 
 const store = new MongoDBSession({
-    // uri: MongoURI,
-    uri: process.env.MONGO_URI,
+    uri: MongoURI,
     collection: "mySessions",
 });
 
@@ -262,9 +263,14 @@ app.post("/map", isAuth, function (req, res) {
         });
 });
 
+app.get("/busstops", isAuth, function(req, res){
+    // console.log(locations);
+    res.json(locations);
+});
+
 //endpoint to fetch the foundBus data through AJAX
 app.get("/selectedbus", isAuth, function (req, res) {
-    //const selectedBus = req.session.selectedBus; // Retrieve the selected bus from the session
+    //let selectedBus = req.session.selectedBus; // Retrieve the selected bus from the session
 
     if (!req.session.selectedBus) {
         console.log("Bus not found. /selectedBus");

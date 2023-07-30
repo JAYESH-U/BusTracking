@@ -36,5 +36,13 @@ const bus3 = new Bus({
     longitude: 74.61385221509138,
     latitude: 15.869056261665328
 });
+const bus4 = new Bus({
+    route: "Bhagya nagar",
+    busNo: 4,
+    password: "Bhagya nagar",
+    numberPlate: "KA 22 MC 2166",
+    longitude: 74.5030350650296,
+    latitude: 15.830011184622268
+});
 
-module.exports = [bus0, bus1, bus2, bus3];
+module.exports = [bus0, bus1, bus2, bus3, bus4];

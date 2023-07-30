@@ -59,23 +59,50 @@
         });
 
         // create the popup
-        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-            'Bus route: <b><%= foundBus.route %></b>,<br>Updated at: <b><%= foundBus.updatedAt.toLocaleTimeString() %></b>'
-        );
+        //const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        //    'Bus route: <b><%= foundBus.route %></b>,<br>Updated at: <b><%= foundBus.updatedAt.toLocaleTimeString() %></b>'
+        //);
 
         // create DOM element for the marker
-        const el = document.createElement('div');
-        el.id = 'marker';
+        //const el = document.createElement('div');
+        //el.id = 'marker';
 
         //new mapboxgl.Marker(el)
         //    .setLngLat([longitude, latitude])
         //    .setPopup(popup)
         //    .addTo(map);
 
+        async function getStops(route) {
+            const response = await fetch("/busstops");
+            const res = await response.json();
+            //console.log(res[route]);
+            const stops = await res[route];
+
+            if(stops){
+                stops.forEach(element => {
+                  const el = document.createElement('div');
+                  el.className = 'marker'; // Add a custom CSS class for styling the markers
+                
+                  const latitude = element.latitude;
+                  const longitude = element.longitude;
+                
+                  // Mark on the map.
+                  new mapboxgl.Marker(el)
+                    .setLngLat([longitude, latitude])
+                    .addTo(map);
+                });
+            }
+        }          
+        
+
         map.on('load', async () => {
 
             // Get the initial location of the International Space Station (bus).
             const geojson = await getLocation();
+
+            console.log(geojson.features[0].properties.route);
+            getStops(geojson.features[0].properties.route);
+            //check on mapbox how to add multiple markers..
 
             // Add the bus location as a source.
             map.addSource('bus', {

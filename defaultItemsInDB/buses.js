@@ -10,7 +10,9 @@ const bus0 = new Bus({
     password: "KLS Gogte Institute of Technology Udyambag",
     numberPlate: "none",
     longitude: 74.4871326464867,
-    latitude: 15.815238972535886
+    latitude: 15.815238972535886,
+    seatsFilled: 0,
+    totalSeats: 0
 });
 const bus1 = new Bus({
     route: "Mahantesh nagar",
@@ -18,7 +20,9 @@ const bus1 = new Bus({
     password: "Mahantesh nagar",
     numberPlate: "KA 22 MC 2166",
     longitude: 74.53642393726847,
-    latitude: 15.881915347206428
+    latitude: 15.881915347206428,
+    seatsFilled: 0,
+    totalSeats: 0
 });
 const bus2 = new Bus({
     route: "Hanuman nagar",
@@ -26,7 +30,9 @@ const bus2 = new Bus({
     password: "Hanuman nagar",
     numberPlate: "KA 22 MC 2166",
     longitude: 74.48591797126895,
-    latitude: 15.876246560391277
+    latitude: 15.876246560391277,
+    seatsFilled: 0,
+    totalSeats: 0
 });
 const bus3 = new Bus({
     route: "Sambra",
@@ -34,7 +40,9 @@ const bus3 = new Bus({
     password: "Sambra",
     numberPlate: "KA 22 MC 2166",
     longitude: 74.61385221509138,
-    latitude: 15.869056261665328
+    latitude: 15.869056261665328,
+    seatsFilled: 0,
+    totalSeats: 0
 });
 const bus4 = new Bus({
     route: "Bhagya nagar",
@@ -42,7 +50,9 @@ const bus4 = new Bus({
     password: "Bhagya nagar",
     numberPlate: "KA 22 MC 2166",
     longitude: 74.5030350650296,
-    latitude: 15.830011184622268
+    latitude: 15.830011184622268,
+    seatsFilled: 0,
+    totalSeats: 0
 });
 
 module.exports = [bus0, bus1, bus2, bus3, bus4];

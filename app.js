@@ -197,10 +197,12 @@ app.post("/trackbus", isAuth, function (req, res) {
     const latitude = req.body.latitude;
     const longitude = req.body.longitude;
     const busNo = req.body.busNo;
+    const seatsFilled = req.body.seatsFilled;
+    const totalSeats = req.body.totalSeats;
     console.log("Received coordinates - Latitude: " + latitude + ", Longitude: " + longitude + ", foundBus number: " + busNo);
 
     //Update.
-    Bus.updateOne({ busNo: busNo }, { longitude: longitude, latitude: latitude })
+    Bus.updateOne({ busNo }, { longitude, latitude, seatsFilled, totalSeats })
         .then(() => {
             console.log("Successfully updated location.");
         })

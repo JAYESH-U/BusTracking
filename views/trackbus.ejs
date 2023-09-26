@@ -4,12 +4,20 @@
     <!-- add bus name to detect the correct bus -->
     <h3>Sending location of <%= foundBus.route %></h3>
     <button id="button" onclick="getLocation()" value="<%= foundBus.busNo %>" >Sending bus location.</button>
-    <p id="demo"></p>
+    <p id="locationDetails"></p>
+    <form name="seatDetails">
+        <label for="seatsFilled">Filled Seats</label>
+        <input type="number" name="seatsFilled" value="<%= foundBus.seatsFilled %>" placeholder="<%= foundBus.seatsFilled %>">
+        <label for="totalSeats">Total Seats</label>
+        <input type="number" name="totalSeats" value="<%= foundBus.totalSeats %>" placeholder="<%= foundBus.totalSeats %>">
+    </form>
+    <p id="seatsInfo"></p>
     <script>
-        var x = document.getElementById("demo");
+        let x = document.getElementById("locationDetails");
+        let y = document.getElementById("seatsInfo");
         const busNo = document.getElementById("button").value;
         //const busNo = <%= foundBus.busNo %>;
-        var interval = 4500; // 4.5 seconds
+        let interval = 4500; // 4.5 seconds
     
         function getLocation() {
             if (navigator.geolocation) {
@@ -21,10 +29,17 @@
         }
     
         function showPosition(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+            
+            // Access seatsFilled and totalSeats values from the form inputs
+            let seatsFilled = document.forms["seatDetails"]["seatsFilled"].value;
+            let totalSeats = document.forms["seatDetails"]["totalSeats"].value;
+
             x.innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude + "<br>Bus number: " + busNo;
-            sendCoordinates(latitude, longitude);
+            y.innerHTML = "seatsFilled: " + seatsFilled + "<br>totalSeats: " + totalSeats + "<br>Bus number: " + busNo;
+
+            sendSeatsAndCoordinates(latitude, longitude, seatsFilled, totalSeats);
         }
     
         function updateLocation() {
@@ -34,18 +49,23 @@
         }
     
         function updatePosition(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+
+            // Access seatsFilled and totalSeats values from the form inputs
+            let seatsFilled = document.forms["seatDetails"]["seatsFilled"].value;
+            let totalSeats = document.forms["seatDetails"]["totalSeats"].value;
+    
             x.innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude + "<br>Bus number: " + busNo;
-            sendCoordinates(latitude, longitude);
+            sendSeatsAndCoordinates(latitude, longitude, seatsFilled, totalSeats);
         }
     
         function handleLocationError(error) {
             console.log("Error getting current location: " + error.message);
         }
     
-        function sendCoordinates(latitude, longitude) {
-            var xhr = new XMLHttpRequest();
+        function sendSeatsAndCoordinates(latitude, longitude, seatsFilled, totalSeats) {
+            let xhr = new XMLHttpRequest();
             /*const busNo = document.getElementById("button").value;  */
             xhr.open("POST", "/trackbus", true);
             xhr.setRequestHeader("Content-Type", "application/json");
@@ -54,7 +74,7 @@
                 console.log("Coordinates sent successfully!");
               }
             };
-            var data = JSON.stringify({ latitude: latitude, longitude: longitude, busNo: busNo });
+            let data = JSON.stringify({ latitude: latitude, longitude: longitude, busNo: busNo, seatsFilled: seatsFilled, totalSeats: totalSeats });
             xhr.send(data);
           }
           

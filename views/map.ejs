@@ -2,7 +2,7 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <img src="img/bus.png" alt="BusLogo" width="30" height="24" class="d-inline-block align-text-top">
                 <%=listTitle%>
             </a>
@@ -130,7 +130,7 @@
                 // Make a GET request to the API and return the location of the bus.
                 try {
                     const response = await fetch("/selectedbus");
-                    const { latitude, longitude, route, updatedAt } = await response.json();
+                    const { latitude, longitude, route, updatedAt, seatsFilled, totalSeats } = await response.json();
                     // Fly the map to the location.
                     map.flyTo({
                         center: [longitude, latitude],
@@ -138,7 +138,7 @@
                         zoom: 14
                     });
 
-                    console.log(longitude +" "+ latitude +" "+ route +" "+ updatedAt);
+                    console.log(longitude +" "+ latitude +" "+ route +" "+ updatedAt +" "+ seatsFilled +"/"+ totalSeats);
 
                     // Return the location of the bus as GeoJSON.
                     return {
@@ -148,7 +148,9 @@
                                 'type': 'Feature',
                                 'properties': {
                                     'route': route,
-                                    'updatedAt': updatedAt
+                                    'updatedAt': updatedAt,
+                                    'seatsFilled': seatsFilled,
+                                    'totalSeats': totalSeats
                                 },
                                 'geometry': {
                                     'type': 'Point',
@@ -184,6 +186,9 @@
                     const formattedTime = updatedAt.toLocaleTimeString(); // Format the time as needed
                     popupContent += ',<br>Updated at: <b>' + formattedTime + ', ' + formattedDate + '</b>';
                 }
+
+                console.log('Seats available : ' + foundBus.seatsFilled + '/' + foundBus.totalSeats);
+                popupContent += ',<br>Seats filled : <b>' + foundBus.seatsFilled + ' / ' + foundBus.totalSeats;
                 
                 new mapboxgl.Popup()
                     .setLngLat(coordinates)

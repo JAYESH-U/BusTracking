@@ -6,7 +6,9 @@ const busSchema = new mongoose.Schema({
     password: String,
     numberPlate: String,
     longitude: Number,
-    latitude: Number
+    latitude: Number,
+    seatsFilled: Number,
+    totalSeats: Number
 }, { timestamps: true }
 );
 

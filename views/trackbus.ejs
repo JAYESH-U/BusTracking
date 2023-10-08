@@ -1,17 +1,43 @@
 <%- include("partials/header") -%>
 
-<body>
+<>
+
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid vw-100">
+            <a class="navbar-brand" href="/">
+                <img src="img/bus.png" alt="BusLogo" width="30" height="24" class="d-inline-block align-text-top">
+                Bus Tracker
+            </a>
+        </div>
+    </nav>
+
     <!-- add bus name to detect the correct bus -->
-    <h3>Sending location of <%= foundBus.route %></h3>
-    <button id="button" onclick="getLocation()" value="<%= foundBus.busNo %>" >Sending bus location.</button>
-    <p id="locationDetails"></p>
-    <form name="seatDetails">
-        <label for="seatsFilled">Filled Seats</label>
-        <input type="number" name="seatsFilled" value="<%= foundBus.seatsFilled %>" placeholder="<%= foundBus.seatsFilled %>">
-        <label for="totalSeats">Total Seats</label>
-        <input type="number" name="totalSeats" value="<%= foundBus.totalSeats %>" placeholder="<%= foundBus.totalSeats %>">
-    </form>
-    <p id="seatsInfo"></p>
+    <div class="container border rounded d-flex justify-content-center align-items-center flex-column my-5">
+        <h2 class="my-4"><%= foundBus.route %></h2>
+        <button class="border rounded mt-2 p-2" id="button" onclick="getLocation()" value="<%= foundBus.busNo %>" >Send bus location.</button>
+        <div class="container border rounded d-flex justify-content-center align-items-center flex-column p-3 mt-3">
+            <p id="locationDetails" class="m-0"></p>
+        </div>
+        <!-- <div class="border-bottom w-100 my-3"></div> -->
+        <form name="seatDetails" class="container d-flex justify-content-center align-items-center flex-column mt-3">
+            <div class="container d-flex justify-content-center align-items-center flex-column my-2">
+                <label for="seatsFilled">Filled Seats</label>
+                <div class="input-group mt-1">
+                    <button class="input-group-text bg-secondary px-4" id="plus">+</button>
+                    <input class="text-center form-control" type="number" name="seatsFilled" id="seatsFilled" placeholder="<%= foundBus.seatsFilled %>" value="<%= foundBus.seatsFilled %>" aria-label="Username" aria-describedby="basic-addon1">
+                    <button class="input-group-text bg-secondary px-4" id="minus">-</button>
+                </div>
+            </div>
+            <div class="container d-flex justify-content-center align-items-center flex-column my-2">
+                <label for="totalSeats">Total Seats</label>
+                <input class="text-center form-control" type="number" name="totalSeats" value="<%= foundBus.totalSeats %>" placeholder="<%= foundBus.totalSeats %>">
+            </div>
+        </form>
+        <div class="container border rounded d-flex justify-content-center align-items-center flex-column p-3 my-3 mx-4">
+            <p id="seatsInfo" class="m-0"></p>
+        </div>
+    </div>
+
     <script>
         let x = document.getElementById("locationDetails");
         let y = document.getElementById("seatsInfo");
@@ -57,6 +83,7 @@
             let totalSeats = document.forms["seatDetails"]["totalSeats"].value;
     
             x.innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude + "<br>Bus number: " + busNo;
+            y.innerHTML = "seatsFilled: " + seatsFilled + "<br>totalSeats: " + totalSeats + "<br>Bus number: " + busNo;
             sendSeatsAndCoordinates(latitude, longitude, seatsFilled, totalSeats);
         }
     
@@ -76,7 +103,37 @@
             };
             let data = JSON.stringify({ latitude: latitude, longitude: longitude, busNo: busNo, seatsFilled: seatsFilled, totalSeats: totalSeats });
             xhr.send(data);
-          }
+        }
+
+        const plusButton = document.getElementById("plus");
+
+        plusButton.addEventListener("click", function () {
+            event.preventDefault();
+            // Get the current value of the "seatsFilled" input field
+            let seatsFilledInput = document.getElementById("seatsFilled");
+            let seatsFilled = parseInt(seatsFilledInput.value);
+        
+            // Increment the value by 1
+            seatsFilled += 1;
+        
+            // Update the input field with the new value
+            seatsFilledInput.value = seatsFilled;
+        });
+
+        const minusButton = document.getElementById("minus");
+        
+        minusButton.addEventListener("click", function () {
+            event.preventDefault();
+            // Get the current value of the "seatsFilled" input field
+            let seatsFilledInput = document.getElementById("seatsFilled");
+            let seatsFilled = parseInt(seatsFilledInput.value);
+        
+            // Increment the value by 1
+            seatsFilled -= 1;
+        
+            // Update the input field with the new value
+            seatsFilledInput.value = seatsFilled;
+        });
           
     </script>
     

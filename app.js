@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
 const session = require("express-session");
 var MongoDBSession = require('connect-mongodb-session')(session);
+const path = require("path");
 
 const Bus = require("./models/busModel");
 const Std = require("./models/studentModel");
@@ -17,6 +18,7 @@ const locations = require("./busStops/buspath.json")
 const app = express();
 
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
